@@ -3,6 +3,9 @@ package nl.blue4it.basic.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import nl.blue4it.basic.controller.dto.request.Payment
 import nl.blue4it.basic.service.async.KafkaClient
 import nl.blue4it.basic.service.async.RestClient
@@ -13,11 +16,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+// as of or whole scope
 typealias AvroPayment = example.avro.Payment
-typealias RequestPayment = Payment;
+typealias RequestPayment = Payment
 
 @Component
-class PaymentService @Autowired constructor(
+class PaymentService constructor(
     private val client: KafkaClient,
     private val client2: RestClient,
     private val client3: SOAPClient
@@ -27,25 +31,26 @@ class PaymentService @Autowired constructor(
         val log: Logger = LoggerFactory.getLogger(PaymentService::class.java)
     }
 
-    fun processPayment(payments: List<RequestPayment>) {
+     fun processPayment(payments: List<RequestPayment>) {
         payments
             .map { payment: RequestPayment -> mapPayment(payment) }
             .forEach { payment: AvroPayment ->
                kotlin.runCatching {
                    CoroutineScope(Dispatchers.Default).sendAsync(payment)
                }.onFailure {
-                   throw PaymentRejectedException("Payment Rejected")
+                   log.info("Exception when handling")
                }.onSuccess {
                    log.info("Successfully send payment")
                }
             }
     }
 
-    private fun CoroutineScope.sendAsync(payment: AvroPayment)  = async() {
-        val soap = async { client3.send(payment) }
-        val rest = async { client2.send(payment) }
-        rest.await()
-        val kafka = async { client.send(payment) }
+    // runblocking, don't do this.
+    // Better do this in combination with flows
+    private fun CoroutineScope.sendAsync(payment: AvroPayment)  = runBlocking {
+        val mq = launch { client2.send(payment) }
+        val soap = launch { client3.send(payment) }
+        val kafka = launch { client.send(payment) }
     }
 
     private fun mapPayment(payment: RequestPayment): AvroPayment {

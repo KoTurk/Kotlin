@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class PaymentController @Autowired constructor(
+class PaymentController constructor(
     private val paymentService: PaymentService
 ) {
     companion object {
