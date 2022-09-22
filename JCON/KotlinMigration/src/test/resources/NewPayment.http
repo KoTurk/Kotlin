@@ -2,6 +2,7 @@ POST localhost:8080/
 Content-Type: application/json
 
 [{
+  "name": "test",
   "fromIban" : "NL63ABNA332454654",
   "toIban" : "NL61RABO0332454375",
   "amount" : 100.0,
