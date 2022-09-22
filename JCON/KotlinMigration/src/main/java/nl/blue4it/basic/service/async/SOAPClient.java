@@ -13,11 +13,13 @@ public class SOAPClient {
     private final KafkaTemplate<String, Payment> kafkaTemplate;
 
     public void send(Payment payment) {
+        System.out.println("SOAP client started");
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
+            System.out.println("InterruptedException");
             throw new RuntimeException(e);
         }
-        System.out.println("Payment SOAP");
+        System.out.println("SOAP client executed");
     }
 }

@@ -8,7 +8,13 @@ import org.springframework.stereotype.Component;
 public class RestClient {
 
     public void send(Payment payment) {
-        System.out.println("Payment REST");
-        throw new SomeOtherClientException("Something bad happened");
+        System.out.println("Rest client started");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            System.out.println("InterruptedException");
+            throw new RuntimeException(e);
+        }
+        System.out.println("Rest client executed");
     }
 }

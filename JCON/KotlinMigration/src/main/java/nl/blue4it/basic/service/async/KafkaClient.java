@@ -13,12 +13,13 @@ public class KafkaClient {
     private final KafkaTemplate<String, Payment> kafkaTemplate;
 
     public void send(Payment payment) {
+        System.out.println("Kafka client started");
         try {
-            Thread.sleep(2000);
+            Thread.sleep(6000);
         } catch (InterruptedException e) {
             System.out.println("InterruptedException");
             throw new RuntimeException(e);
         }
-        System.out.println("Payment Kafka");
+        System.out.println("Kafka client executed");
     }
 }
