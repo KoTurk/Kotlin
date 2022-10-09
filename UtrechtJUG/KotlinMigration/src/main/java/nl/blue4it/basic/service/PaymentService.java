@@ -32,27 +32,24 @@ public class PaymentService {
     }
 
     private example.avro.Payment mapPayment(Payment payment) {
-        Integer duration = null;
+        int durationNumber;
 
-        // null check
-        if(payment.getDuration() != null) {
-            log.info("Going to map with  {}", payment.getDuration());
+        log.info("Going to map with  {}", payment.getDuration());
 
-            // can change to switch to when
-            if (payment.getDuration().equals("weekly")) {
-                duration = 1;
-            } else if (payment.getDuration().equals("monthly")) {
-                duration = 2;
-            } else if (payment.getDuration().equals("yearly")) {
-                duration = 3;
-            } else {
-                duration = 0;
-            }
+        // can change to switch to when
+        if (payment.getDuration().equals("weekly")) {
+            durationNumber = 1;
+        } else if (payment.getDuration().equals("monthly")) {
+            durationNumber = 2;
+        } else if (payment.getDuration().equals("yearly")) {
+            durationNumber = 3;
+        } else {
+            durationNumber = 0;
         }
 
         // type alias
         return new example.avro.Payment(payment.getName(), payment.getFromIban(), payment.getToIban(),
-                payment.getAmount(), payment.getBalance(), true, duration);
+                payment.getAmount(), payment.getBalance(), true, durationNumber);
     }
 }
 
