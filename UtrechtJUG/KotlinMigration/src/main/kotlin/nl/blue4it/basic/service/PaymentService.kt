@@ -1,26 +1,29 @@
 package nl.blue4it.basic.service
 
 import nl.blue4it.basic.controller.dto.request.Payment
+import nl.blue4it.basic.service.async.KafkaClient
+import nl.blue4it.basic.service.async.RestClient
+import nl.blue4it.basic.service.async.SOAPClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 
 typealias RequestPayment = Payment
 typealias AvroPayment = example.avro.Payment
 
-@Component
-class PaymentService constructor(private val client: AsyncSender) {
+class PaymentService(private val client: KafkaClient,
+        private val client2: SOAPClient,
+        private val client3: RestClient) {
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(PaymentService::class.java)
     }
 
-    fun processPayment(payments: List<Payment>) {
+    suspend fun processPayment(payments: List<Payment>) {
         payments
             .map { payment -> payment.mapPayment() }
             .forEach { payment: AvroPayment ->
                 kotlin.runCatching {
-                    client.send(payment)
+                    sendAsync(payment)
                 }.onFailure {
                     log.error("something bad happened")
                 }
@@ -50,4 +53,12 @@ class PaymentService constructor(private val client: AsyncSender) {
             this.amount, this.balance, true, durationNumber
         )
     }
+
+    private suspend fun sendAsync(payment: AvroPayment) {
+        client.send(payment)
+        client2.send(payment)
+        client3.send(payment)
+    }
+
+
 }
